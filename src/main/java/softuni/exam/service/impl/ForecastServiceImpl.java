@@ -16,7 +16,6 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,13 +70,10 @@ public class ForecastServiceImpl implements ForecastService {
 
     @Override
     public String exportForecasts() {
-        List<Forecast> sundayForecasts = forecastRepository.findAllByDayOfWeekOrderByMaxTemperatureDescIdAsc(DayOfWeek.valueOf("SUNDAY"));
+        List<Forecast> sundayForecasts = forecastRepository.findAllByDayOfWeekAndPopulation(DayOfWeek.SUNDAY);
         StringBuilder result = new StringBuilder();
         for (Forecast f : sundayForecasts) {
-            City city = f.getCity();
-            if (city.getPopulation() < 150000) {
-                result.append(String.format("City: %s\n   -min temperature: %.2f\n   --max temperature: %.2f\n   ---sunrise: %s\n   ----sunset: %s\n", city.getCityName(), f.getMinTemperature(), f.getMaxTemperature(), f.getSunrise(), f.getSunset()));
-            }
+                result.append(String.format("City: %s\n   -min temperature: %.2f\n   --max temperature: %.2f\n   ---sunrise: %s\n   ----sunset: %s\n   ----day: %s\n", f.getCity().getCityName(), f.getMinTemperature(), f.getMaxTemperature(), f.getSunrise(), f.getSunset(), f.getDayOfWeek()));
         }
 
         return result.toString();
